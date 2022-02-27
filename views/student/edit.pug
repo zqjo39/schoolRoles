@@ -1,0 +1,6 @@
+extends ../layout
+
+block content
+    include ../mixins/studentForm
+    +studentForm(student, `/students/edit/${student.id}`,`/students/profile/${student.id}`)
+
