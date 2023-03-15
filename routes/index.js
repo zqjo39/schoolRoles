@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const courseController = require('../controllers/courseController.js');
 const studentController = require('../controllers/studentController.js');
+const userController = require('../controllers/userController');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -30,5 +31,9 @@ router.get('/students/:studentId/removeCourse/:courseId', studentController.remo
 router.post('/courses/:courseId/enroll', courseController.enrollStudent);
 router.get('/courses/:courseId/removeStudent/:studentId', courseController.removeStudent);
 
+router.get('/register-student', userController.renderStudentRegistrationForm);
+router.post('/register-student', userController.registerStudent);
+
+router.get('/login', userController.renderLoginForm);
 
 module.exports = router;
