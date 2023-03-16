@@ -1,8 +1,7 @@
-extends ../layout
+mixin registerForm(saveUrl, userType)
 
-block content
     div.form-container
-        form(action = '/register-student' method = 'post')
+        form(action = saveUrl method = 'post')
             div.form-input
                 label(for = 'email') Email:
                 input(id = 'email' name = 'email')
@@ -15,10 +14,11 @@ block content
             div.form-input
                 label(for = 'last_name') Last Name:
                 input(id = 'last_name' name = 'last_name')
-            div.form-input
-                label(for = 'grade_level') Grade:
-                select(id = 'grade_level' name = 'grade_level')
-                    each grade in [9, 10, 11, 12]
-                        option(value = grade) #{grade}
+            if userType === 'student'
+                div.form-input
+                    label(for = 'grade_level') Grade Level:
+                    select(id = 'grade_level' name = 'grade_level')
+                        each grade in [9, 10, 11, 12]
+                            option(value = grade) #{grade}
             div.form-buttons
-                button.button.primary(type = 'submit') Save
+                button.button.primary(type = 'submit') Register

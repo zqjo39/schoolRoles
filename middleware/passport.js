@@ -33,7 +33,9 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(async function(user, done) {
-    const userModel = await User.findByPk(user.id);
+    const userModel = await User.findByPk(user.id, {
+        include: ['student', 'staff']
+    });
     process.nextTick(function() {
         return done(null, userModel);
     });
