@@ -2,12 +2,25 @@ const {Student, Course, StudentCourses} = require('../models')
 
 //view all
 module.exports.viewAll = async function (req, res) {
+    if (!req.user.can('view students')) {
+        res.redirect('/');
+        return
+    }
     const students = await Student.findAll();
     res.render('student/view_all', {students});
 }
 
 //profile
 module.exports.viewProfile = async function (req, res) {
+    const isAdmin = req.user.can('view students');
+    const profileBelongsToUser = req.user.can('view self') && req.user.matchesStudentId(req.params.id);
+
+    // if not staff or student, redirect
+    if (!isAdmin && !profileBelongsToUser) {
+        res.redirect('/');
+        return
+    }
+
     const student = await Student.findByPk(req.params.id, {
         include: 'courses'
     });
@@ -21,28 +34,17 @@ module.exports.viewProfile = async function (req, res) {
     res.render('student/profile', {student, availableCourses})
 }
 
-//render add
-module.exports.renderAddForm = function (req, res) {
-    const student = {
-        first_name: '',
-        last_name: '',
-        grade_level: 9,
-    }
-    res.render('student/add', {student});
-}
-
-//add
-module.exports.addStudent = async function (req, res) {
-    const student = await Student.create({
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        grade_level: req.body.grade_level
-    });
-    res.redirect(`/students/profile/${student.id}`);
-}
-
 //render edit
 module.exports.renderEditForm = async function (req, res) {
+    const isAdmin = req.user.can('edit students');
+    const profileBelongsToUser = req.user.can('edit self') && req.user.matchesStudentId(req.params.id);
+
+    // if not staff or student, redirect
+    if (!isAdmin && !profileBelongsToUser) {
+        res.redirect('/');
+        return
+    }
+
     const student = await Student.findByPk(req.params.id);
     console.log(student);
     res.render('student/edit', {student});
@@ -50,6 +52,15 @@ module.exports.renderEditForm = async function (req, res) {
 
 //update
 module.exports.updateStudent = async function (req, res) {
+    const isAdmin = req.user.can('edit students');
+    const profileBelongsToUser = req.user.can('edit self') && req.user.matchesStudentId(req.params.id);
+
+    // if not staff or student, redirect
+    if (!isAdmin && !profileBelongsToUser) {
+        res.redirect('/');
+        return
+    }
+
     const student = await Student.update({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
@@ -65,6 +76,10 @@ module.exports.updateStudent = async function (req, res) {
 
 //delete
 module.exports.deleteStudent = async function (req, res) {
+    if (!user.can('delete students')) {
+        res.redirect('/');
+        return
+    }
     await Student.destroy({
         where: {
             id: req.params.id
@@ -75,8 +90,16 @@ module.exports.deleteStudent = async function (req, res) {
 
 //Add course to student
 module.exports.enrollStudent = async function (req, res) {
+    const isAdmin = req.user.can('enroll students');
+    const profileBelongsToUser = req.user.can('enroll self') && req.user.matchesStudentId(req.params.studentId);
 
-        await StudentCourses.create({
+    // if not staff or student, redirect
+    if (!isAdmin && !profileBelongsToUser) {
+        res.redirect('/');
+        return
+    }
+
+    await StudentCourses.create({
             student_id: req.params.studentId,
             course_id: req.body.course
         })
@@ -86,6 +109,15 @@ module.exports.enrollStudent = async function (req, res) {
 
 //delete course from student
 module.exports.removeCourse = async function(req, res){
+    const isAdmin = req.user.can('drop students');
+    const profileBelongsToUser = req.user.can('drop self') && req.user.matchesStudentId(req.params.studentId);
+
+    // if not staff or student, redirect
+    if (!isAdmin && !profileBelongsToUser) {
+        res.redirect('/');
+        return
+    }
+
     await StudentCourses.destroy({
         where: {
             student_id: req.params.studentId,

@@ -40,11 +40,17 @@ module.exports = (sequelize, DataTypes) => {
               'view self',
               'enroll self',
               'drop self',
-              'edit self',
+              'edit self'
           ]
       }
       return allowedActions.indexOf(action) !== -1
     }
+    matchesStudentId(id) {
+        if (!this.student) {
+            return false;
+        }
+        return this.student.id === id;
+    };
   };
   User.init({
     email: DataTypes.STRING,

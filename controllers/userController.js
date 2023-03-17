@@ -46,7 +46,7 @@ module.exports.registerStaff = async function (req, res) {
 // render login form
 module.exports.renderLoginForm = function(req, res) {
     let errorMessages = [];
-    if (req.sessions.messages) {
+    if (req.session.messages) {
         errorMessages = req.session.messages;
     }
     res.render('user/login', {errorMessages});
